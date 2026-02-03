@@ -337,7 +337,7 @@ async function gitTagAndRelease(newVersion: string, notes: string[]): Promise<vo
   await $`git config user.name "github-actions[bot]"`
   
   // Add all package.json files
-  await $`git add package.json assets/oh-my-opencode.schema.json`
+  await $`git add package.json assets/sisyphus-flow.schema.json`
   for (const platform of PLATFORM_PACKAGES) {
     await $`git add packages/${platform}/package.json`.nothrow()
   }

@@ -257,7 +257,7 @@ describe("generateOmoConfig - model fallback system", () => {
     const result = generateOmoConfig(config)
 
     // #then Sisyphus uses Claude (OR logic - at least one provider available)
-    expect(result.$schema).toBe("https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json")
+    expect(result.$schema).toBe("https://raw.githubusercontent.com/dubaigit/sisyphus-flow/master/assets/sisyphus-flow.schema.json")
     expect(result.agents).toBeDefined()
     expect((result.agents as Record<string, { model: string }>)["sisyphus-flow"].model).toBe("anthropic/claude-opus-4-5")
   })
@@ -319,7 +319,7 @@ describe("generateOmoConfig - model fallback system", () => {
     const result = generateOmoConfig(config)
 
     // #then Sisyphus is omitted (requires all fallback providers)
-    expect(result.$schema).toBe("https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json")
+    expect(result.$schema).toBe("https://raw.githubusercontent.com/dubaigit/sisyphus-flow/master/assets/sisyphus-flow.schema.json")
     expect((result.agents as Record<string, { model: string }>)["sisyphus-flow"]).toBeUndefined()
   })
 
