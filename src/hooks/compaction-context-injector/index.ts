@@ -1,13 +1,12 @@
-import { injectHookMessage } from "../../features/hook-message-injector"
 import { log } from "../../shared/logger"
 import { createSystemDirective, SystemDirectiveTypes } from "../../shared/system-directive"
 
-export interface SummarizeContext {
+export interface CompactionInput {
   sessionID: string
-  providerID: string
-  modelID: string
-  usageRatio: number
-  directory: string
+}
+
+export interface CompactionOutput {
+  context: string[]
 }
 
 const SUMMARIZE_CONTEXT_PROMPT = `${createSystemDirective(SystemDirectiveTypes.COMPACTION_CONTEXT)}
@@ -71,20 +70,30 @@ Use claude-flow swarms for coordinated multi-agent tasks (3+ agents).
 This context is critical for maintaining continuity after compaction.
 `
 
+/**
+ * Creates a compaction context injector that pushes context strings to the
+ * output.context array provided by OpenCode's compacting hook.
+ *
+ * This avoids writing synthetic messages to the filesystem (via injectHookMessage),
+ * which was causing double compaction — OpenCode would detect the new filesystem
+ * message and trigger a second compaction pass.
+ */
 export function createCompactionContextInjector() {
-  return async (ctx: SummarizeContext): Promise<void> => {
-    log("[compaction-context-injector] injecting context", { sessionID: ctx.sessionID })
+  const injectedSessions = new Set<string>()
 
-    const success = injectHookMessage(ctx.sessionID, SUMMARIZE_CONTEXT_PROMPT, {
-      agent: "general",
-      model: { providerID: ctx.providerID, modelID: ctx.modelID },
-      path: { cwd: ctx.directory },
-    })
-
-    if (success) {
-      log("[compaction-context-injector] context injected", { sessionID: ctx.sessionID })
-    } else {
-      log("[compaction-context-injector] injection failed", { sessionID: ctx.sessionID })
+  return (input: CompactionInput, output: CompactionOutput): void => {
+    if (injectedSessions.has(input.sessionID)) {
+      log("[compaction-context-injector] skipping duplicate for session", { sessionID: input.sessionID })
+      return
     }
+
+    injectedSessions.add(input.sessionID)
+    output.context.push(SUMMARIZE_CONTEXT_PROMPT)
+    log("[compaction-context-injector] context pushed to output.context", { sessionID: input.sessionID })
+
+    // Allow re-injection after 60s (for subsequent compactions in long sessions)
+    setTimeout(() => {
+      injectedSessions.delete(input.sessionID)
+    }, 60_000)
   }
 }

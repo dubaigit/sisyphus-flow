@@ -920,17 +920,12 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
       await taskResumeInfo["tool.execute.after"](input, output);
     },
 
-    "experimental.session.compacting": async (input: { sessionID: string }) => {
-      if (!compactionContextInjector) {
-        return;
-      }
-      await compactionContextInjector({
-        sessionID: input.sessionID,
-        providerID: "anthropic",
-        modelID: "claude-opus-4-5",
-        usageRatio: 0.8,
-        directory: ctx.directory,
-      });
+    "experimental.session.compacting": async (
+      input: { sessionID: string },
+      output: { context: string[] }
+    ) => {
+      await claudeCodeHooks["experimental.session.compacting"]?.(input, output);
+      compactionContextInjector?.(input, output);
     },
   };
 };

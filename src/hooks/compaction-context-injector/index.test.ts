@@ -1,10 +1,7 @@
-import { describe, expect, it, mock, beforeEach } from "bun:test"
+import { describe, expect, it, beforeEach } from "bun:test"
 
 // Mock dependencies before importing
-const mockInjectHookMessage = mock(() => true)
-mock.module("../../features/hook-message-injector", () => ({
-  injectHookMessage: mockInjectHookMessage,
-}))
+import { mock } from "bun:test"
 
 mock.module("../../shared/logger", () => ({
   log: () => {},
@@ -25,144 +22,148 @@ mock.module("../../shared/system-directive", () => ({
 }))
 
 import { createCompactionContextInjector } from "./index"
-import type { SummarizeContext } from "./index"
+import type { CompactionInput, CompactionOutput } from "./index"
 
 describe("createCompactionContextInjector", () => {
+  let injector: ReturnType<typeof createCompactionContextInjector>
+  let input: CompactionInput
+  let output: CompactionOutput
+
   beforeEach(() => {
-    mockInjectHookMessage.mockClear()
+    injector = createCompactionContextInjector()
+    input = { sessionID: "test-session" }
+    output = { context: [] }
+  })
+
+  describe("context injection via output.context", () => {
+    it("pushes context to output.context array instead of filesystem", () => {
+      //#given - fresh injector and empty output
+
+      //#when
+      injector(input, output)
+
+      //#then
+      expect(output.context).toHaveLength(1)
+      expect(output.context[0]).toContain("When summarizing this session")
+    })
+
+    it("does not use injectHookMessage (no filesystem writes)", () => {
+      //#given - output.context is the only injection mechanism
+
+      //#when
+      injector(input, output)
+
+      //#then - context is pushed to array, not written to filesystem
+      expect(output.context.length).toBeGreaterThan(0)
+      expect(typeof output.context[0]).toBe("string")
+    })
+  })
+
+  describe("session deduplication guard", () => {
+    it("skips duplicate injection for same session", () => {
+      //#given
+      injector(input, output)
+      expect(output.context).toHaveLength(1)
+
+      //#when - called again for same session
+      const output2: CompactionOutput = { context: [] }
+      injector(input, output2)
+
+      //#then - second call is skipped
+      expect(output2.context).toHaveLength(0)
+    })
+
+    it("allows injection for different sessions", () => {
+      //#given
+      injector(input, output)
+      expect(output.context).toHaveLength(1)
+
+      //#when - different session
+      const input2: CompactionInput = { sessionID: "other-session" }
+      const output2: CompactionOutput = { context: [] }
+      injector(input2, output2)
+
+      //#then
+      expect(output2.context).toHaveLength(1)
+    })
   })
 
   describe("Agent Verification State preservation", () => {
-    it("includes Agent Verification State section in compaction prompt", async () => {
-      // given
-      const injector = createCompactionContextInjector()
-      const context: SummarizeContext = {
-        sessionID: "test-session",
-        providerID: "anthropic",
-        modelID: "claude-sonnet-4-5",
-        usageRatio: 0.85,
-        directory: "/test/dir",
-      }
+    it("includes Agent Verification State section in compaction prompt", () => {
+      //#given - fresh injector
 
-      // when
-      await injector(context)
+      //#when
+      injector(input, output)
 
-      // then
-      expect(mockInjectHookMessage).toHaveBeenCalledTimes(1)
-      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
-      const injectedPrompt = calls[0]?.[1] ?? ""
+      //#then
+      const injectedPrompt = output.context[0] ?? ""
       expect(injectedPrompt).toContain("Agent Verification State")
       expect(injectedPrompt).toContain("Current Agent")
       expect(injectedPrompt).toContain("Verification Progress")
     })
 
-    it("includes Momus-specific context for reviewer agents", async () => {
-      // given
-      const injector = createCompactionContextInjector()
-      const context: SummarizeContext = {
-        sessionID: "test-session",
-        providerID: "anthropic",
-        modelID: "claude-sonnet-4-5",
-        usageRatio: 0.9,
-        directory: "/test/dir",
-      }
+    it("includes Momus-specific context for reviewer agents", () => {
+      //#given - fresh injector
 
-      // when
-      await injector(context)
+      //#when
+      injector(input, output)
 
-      // then
-      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
-      const injectedPrompt = calls[0]?.[1] ?? ""
+      //#then
+      const injectedPrompt = output.context[0] ?? ""
       expect(injectedPrompt).toContain("Previous Rejections")
       expect(injectedPrompt).toContain("Acceptance Status")
       expect(injectedPrompt).toContain("reviewer agents")
     })
 
-    it("preserves file verification progress in compaction prompt", async () => {
-      // given
-      const injector = createCompactionContextInjector()
-      const context: SummarizeContext = {
-        sessionID: "test-session",
-        providerID: "anthropic",
-        modelID: "claude-sonnet-4-5",
-        usageRatio: 0.95,
-        directory: "/test/dir",
-      }
+    it("preserves file verification progress in compaction prompt", () => {
+      //#given - fresh injector
 
-      // when
-      await injector(context)
+      //#when
+      injector(input, output)
 
-      // then
-      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
-      const injectedPrompt = calls[0]?.[1] ?? ""
+      //#then
+      const injectedPrompt = output.context[0] ?? ""
       expect(injectedPrompt).toContain("Pending Verifications")
       expect(injectedPrompt).toContain("Files already verified")
     })
   })
 
   describe("Claude-Flow swarm state preservation", () => {
-    it("includes Claude-Flow Swarm State section in compaction prompt", async () => {
-      //#given
-      const injector = createCompactionContextInjector()
-      const context: SummarizeContext = {
-        sessionID: "test-session",
-        providerID: "anthropic",
-        modelID: "claude-sonnet-4-5",
-        usageRatio: 0.85,
-        directory: "/test/dir",
-      }
+    it("includes Claude-Flow Swarm State section in compaction prompt", () => {
+      //#given - fresh injector
 
       //#when
-      await injector(context)
+      injector(input, output)
 
       //#then
-      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
-      const injectedPrompt = calls[0]?.[1] ?? ""
+      const injectedPrompt = output.context[0] ?? ""
       expect(injectedPrompt).toContain("Claude-Flow Swarm State")
       expect(injectedPrompt).toContain("Swarm Active")
       expect(injectedPrompt).toContain("Memory Entries")
     })
 
-    it("includes claude-flow tool names as reminder in compaction prompt", async () => {
-      //#given
-      const injector = createCompactionContextInjector()
-      const context: SummarizeContext = {
-        sessionID: "test-session",
-        providerID: "anthropic",
-        modelID: "claude-sonnet-4-5",
-        usageRatio: 0.9,
-        directory: "/test/dir",
-      }
+    it("includes claude-flow tool names as reminder in compaction prompt", () => {
+      //#given - fresh injector
 
       //#when
-      await injector(context)
+      injector(input, output)
 
       //#then
-      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
-      const injectedPrompt = calls[0]?.[1] ?? ""
+      const injectedPrompt = output.context[0] ?? ""
       expect(injectedPrompt).toContain("cf_swarm_init")
       expect(injectedPrompt).toContain("cf_memory_search")
       expect(injectedPrompt).toContain("cf_hive_mind_consensus")
       expect(injectedPrompt).toContain("cf_security_scan")
     })
 
-    it("reminds to use cf_memory_search before resuming work", async () => {
-      //#given
-      const injector = createCompactionContextInjector()
-      const context: SummarizeContext = {
-        sessionID: "test-session",
-        providerID: "anthropic",
-        modelID: "claude-sonnet-4-5",
-        usageRatio: 0.95,
-        directory: "/test/dir",
-      }
+    it("reminds to use cf_memory_search before resuming work", () => {
+      //#given - fresh injector
 
       //#when
-      await injector(context)
+      injector(input, output)
 
       //#then
-      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
-      const injectedPrompt = calls[0]?.[1] ?? ""
+      const injectedPrompt = output.context[0] ?? ""
       expect(injectedPrompt).toContain("cf_memory_search")
       expect(injectedPrompt).toContain("prior learnings before resuming")
     })
