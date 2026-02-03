@@ -462,6 +462,22 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     sisyphusJuniorModel: pluginConfig.agents?.["sisyphus-junior"]?.model,
     browserProvider,
     routingPolicy,
+    consensusConfig: claudeFlowEnabled && pluginConfig.claude_flow?.consensus?.enabled
+      ? {
+          enabled: true,
+          defaultAlgorithm: (pluginConfig.claude_flow.consensus.defaultAlgorithm ?? "raft") as "raft" | "byzantine" | "gossip" | "crdt" | "quorum",
+          requiredCategories: pluginConfig.claude_flow.consensus.requiredCategories ?? [],
+        }
+      : undefined,
+    memoryConfig: claudeFlowEnabled && pluginConfig.claude_flow?.memory?.enabled
+      ? {
+          enabled: true,
+          backend: (pluginConfig.claude_flow.memory.backend ?? "hybrid") as "hybrid" | "agentdb" | "sqlite" | "memory",
+          defaultNamespace: pluginConfig.claude_flow.memory.defaultNamespace ?? "shared",
+          maxSearchResults: pluginConfig.claude_flow.memory.maxSearchResults ?? 10,
+          autoStoreLearnings: pluginConfig.claude_flow.memory.autoStoreLearnings ?? false,
+        }
+      : undefined,
     onSyncSessionCreated: async (event) => {
       log("[index] onSyncSessionCreated callback", {
         sessionID: event.sessionID,

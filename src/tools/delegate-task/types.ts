@@ -44,6 +44,10 @@ export interface DelegateTaskToolOptions {
   onSyncSessionCreated?: (event: SyncSessionCreatedEvent) => Promise<void>
   /** Claude-flow routing policy — when enabled, routes certain categories to swarm executor */
   routingPolicy?: import("../../claude-flow/types").RoutingPolicy
+  /** Claude-flow consensus config — when enabled, gates certain categories with HiveMind consensus */
+  consensusConfig?: import("../../claude-flow/types").ClaudeFlowConsensusConfig
+  /** Claude-flow memory config — when enabled, searches memory before and stores learnings after task execution */
+  memoryConfig?: import("../../claude-flow/types").ClaudeFlowMemoryConfig
 }
 
 export interface BuildSystemContentInput {

@@ -16,6 +16,8 @@ import {
 } from "./executor"
 import { resolveExecutorBackend } from "./routing"
 import { executeSwarmTask } from "./swarm-executor"
+import { runConsensusGate, augmentPromptWithConsensus } from "./consensus-gate"
+import { searchMemoryForTask, augmentPromptWithMemory, storeLearning } from "./memory-enhancer"
 import { getClaudeFlowRuntime } from "../../claude-flow"
 
 export { resolveCategoryConfig } from "./categories"
@@ -164,6 +166,34 @@ Prompts MUST be in English.`
         categoryModel = resolution.categoryModel
       }
 
+      let enrichedPrompt = args.prompt
+
+      // --- Layer 5: Memory-Enhanced Context ---
+      if (options.memoryConfig && args.category) {
+        const memoryResult = await searchMemoryForTask(
+          { description: args.description, category: args.category },
+          { memoryConfig: options.memoryConfig },
+        )
+        if (memoryResult.found) {
+          enrichedPrompt = augmentPromptWithMemory(enrichedPrompt, memoryResult)
+          log("[delegate_task] memory context injected", { resultCount: memoryResult.resultCount })
+        }
+      }
+
+      // --- Layer 4: Consensus Gate ---
+      if (options.consensusConfig && args.category) {
+        const gate = await runConsensusGate({
+          category: args.category,
+          description: args.description,
+          prompt: enrichedPrompt,
+          consensusConfig: options.consensusConfig,
+        })
+        if (gate.consensusObtained) {
+          enrichedPrompt = augmentPromptWithConsensus(enrichedPrompt, gate)
+          log("[delegate_task] consensus injected", { confidence: gate.confidence })
+        }
+      }
+
       const systemContent = buildSystemContent({ skillContent, categoryPromptAppend, agentName: agentToUse })
 
       // --- Claude-Flow Swarm Routing ---
@@ -184,7 +214,7 @@ Prompts MUST be in English.`
         if (routing.executor === "swarm") {
           const swarmResult = await executeSwarmTask({
             description: args.description,
-            prompt: args.prompt,
+            prompt: enrichedPrompt,
             category: args.category,
             agentToUse,
             systemContent,
@@ -192,6 +222,13 @@ Prompts MUST be in English.`
           })
 
           if (swarmResult.success && !swarmResult.fallbackToLocal) {
+            // Layer 5: Store learning on swarm success
+            if (options.memoryConfig?.autoStoreLearnings) {
+              storeLearning(
+                { description: args.description, category: args.category, outcome: "success", details: `Routed to swarm agent: ${swarmResult.agentType}` },
+                { memoryConfig: options.memoryConfig },
+              ).catch(() => {}) // fire-and-forget
+            }
             return swarmResult.output ?? `Swarm task dispatched: ${swarmResult.reason}`
           }
 
@@ -202,11 +239,30 @@ Prompts MUST be in English.`
         }
       }
 
+      // Pass enriched prompt (with memory context + consensus) to executors
+      const enrichedArgs = enrichedPrompt !== args.prompt ? { ...args, prompt: enrichedPrompt } : args
+
       if (runInBackground) {
-        return executeBackgroundTask(args, ctx, options, parentContext, agentToUse, categoryModel, systemContent)
+        const result = await executeBackgroundTask(enrichedArgs, ctx, options, parentContext, agentToUse, categoryModel, systemContent)
+        // Layer 5: Store learning on local success (fire-and-forget)
+        if (options.memoryConfig?.autoStoreLearnings && args.category) {
+          storeLearning(
+            { description: args.description, category: args.category, outcome: "success", details: "Executed via local background executor" },
+            { memoryConfig: options.memoryConfig },
+          ).catch(() => {})
+        }
+        return result
       }
 
-      return executeSyncTask(args, ctx, options, parentContext, agentToUse, categoryModel, systemContent, modelInfo)
+      const result = await executeSyncTask(enrichedArgs, ctx, options, parentContext, agentToUse, categoryModel, systemContent, modelInfo)
+      // Layer 5: Store learning on local sync success (fire-and-forget)
+      if (options.memoryConfig?.autoStoreLearnings && args.category) {
+        storeLearning(
+          { description: args.description, category: args.category, outcome: "success", details: "Executed via local sync executor" },
+          { memoryConfig: options.memoryConfig },
+        ).catch(() => {})
+      }
+      return result
     },
   })
 }
