@@ -17,6 +17,24 @@ import {
 
 import { grep } from "./grep"
 import { glob } from "./glob"
+
+// Claude-Flow tools
+import {
+  cf_swarm_init,
+  cf_swarm_status,
+  cf_swarm_stop,
+  cf_agent_spawn,
+} from "./claude-flow-swarm"
+
+import {
+  cf_memory_store,
+  cf_memory_search,
+  cf_memory_retrieve,
+} from "./claude-flow-memory"
+
+import { cf_hive_mind_consensus } from "./claude-flow-hivemind"
+
+import { cf_security_scan } from "./claude-flow-security"
 export { createSlashcommandTool, discoverCommandsSync } from "./slashcommand"
 
 import {
@@ -78,4 +96,17 @@ export const builtinTools: Record<string, ToolDefinition> = {
   session_read,
   session_search,
   session_info,
+}
+
+/** Claude-Flow tools — registered conditionally when claude_flow.enabled */
+export const claudeFlowTools: Record<string, ToolDefinition> = {
+  cf_swarm_init,
+  cf_swarm_status,
+  cf_swarm_stop,
+  cf_agent_spawn,
+  cf_memory_store,
+  cf_memory_search,
+  cf_memory_retrieve,
+  cf_hive_mind_consensus,
+  cf_security_scan,
 }

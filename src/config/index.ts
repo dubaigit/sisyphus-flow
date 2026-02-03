@@ -1,5 +1,10 @@
 export {
+  SisyphusFlowConfigSchema,
   OhMyOpenCodeConfigSchema,
+  ClaudeFlowConfigSchema,
+  ClaudeFlowRoutingPolicySchema,
+  ClaudeFlowMemoryConfigSchema,
+  ClaudeFlowConsensusConfigSchema,
   AgentOverrideConfigSchema,
   AgentOverridesSchema,
   McpNameSchema,
@@ -14,7 +19,12 @@ export {
 } from "./schema"
 
 export type {
+  SisyphusFlowConfig,
   OhMyOpenCodeConfig,
+  ClaudeFlowConfig,
+  ClaudeFlowRoutingPolicy,
+  ClaudeFlowMemoryConfig,
+  ClaudeFlowConsensusConfig,
   AgentOverrideConfig,
   AgentOverrides,
   McpName,

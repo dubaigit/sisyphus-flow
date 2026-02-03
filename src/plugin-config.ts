@@ -87,29 +87,46 @@ export function mergeConfigs(
       ]),
     ],
     claude_code: deepMerge(base.claude_code, override.claude_code),
+    claude_flow: deepMerge(base.claude_flow, override.claude_flow),
   };
+}
+
+/**
+ * Resolve config file path with priority:
+ *   1. sisyphus-flow.json[c] (primary)
+ *   2. oh-my-opencode.json[c] (backward-compat fallback)
+ */
+function resolveConfigPath(baseDir: string, subPath: string): string {
+  // Try sisyphus-flow first
+  const sfBasePath = path.join(baseDir, subPath, "sisyphus-flow");
+  const sfDetected = detectConfigFile(sfBasePath);
+  if (sfDetected.format !== "none") {
+    log(`Config found at ${sfDetected.path} (sisyphus-flow)`);
+    return sfDetected.path;
+  }
+
+  // Fallback to oh-my-opencode
+  const omoBasePath = path.join(baseDir, subPath, "oh-my-opencode");
+  const omoDetected = detectConfigFile(omoBasePath);
+  if (omoDetected.format !== "none") {
+    log(`Config found at ${omoDetected.path} (oh-my-opencode fallback)`);
+    return omoDetected.path;
+  }
+
+  // Default to sisyphus-flow.json (will be created if needed)
+  return sfBasePath + ".json";
 }
 
 export function loadPluginConfig(
   directory: string,
   ctx: unknown
 ): OhMyOpenCodeConfig {
-  // User-level config path - prefer .jsonc over .json
+  // User-level config path - sisyphus-flow.json[c] > oh-my-opencode.json[c]
   const configDir = getOpenCodeConfigDir({ binary: "opencode" });
-  const userBasePath = path.join(configDir, "oh-my-opencode");
-  const userDetected = detectConfigFile(userBasePath);
-  const userConfigPath =
-    userDetected.format !== "none"
-      ? userDetected.path
-      : userBasePath + ".json";
+  const userConfigPath = resolveConfigPath(configDir, "");
 
-  // Project-level config path - prefer .jsonc over .json
-  const projectBasePath = path.join(directory, ".opencode", "oh-my-opencode");
-  const projectDetected = detectConfigFile(projectBasePath);
-  const projectConfigPath =
-    projectDetected.format !== "none"
-      ? projectDetected.path
-      : projectBasePath + ".json";
+  // Project-level config path - sisyphus-flow.json[c] > oh-my-opencode.json[c]
+  const projectConfigPath = resolveConfigPath(directory, ".opencode");
 
   // Load user config first (base)
   let config: OhMyOpenCodeConfig =
@@ -131,6 +148,7 @@ export function loadPluginConfig(
     disabled_mcps: config.disabled_mcps,
     disabled_hooks: config.disabled_hooks,
     claude_code: config.claude_code,
+    claude_flow: config.claude_flow,
   });
   return config;
 }

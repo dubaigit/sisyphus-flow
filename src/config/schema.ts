@@ -17,7 +17,7 @@ const AgentPermissionSchema = z.object({
 })
 
 export const BuiltinAgentNameSchema = z.enum([
-  "sisyphus",
+  "sisyphus-flow",
   "hephaestus",
   "prometheus",
   "oracle",
@@ -39,7 +39,7 @@ export const BuiltinSkillNameSchema = z.enum([
 export const OverridableAgentNameSchema = z.enum([
   "build",
   "plan",
-  "sisyphus",
+  "sisyphus-flow",
   "hephaestus",
   "sisyphus-junior",
   "OpenCode-Builder",
@@ -366,11 +366,76 @@ export const SisyphusTasksConfigSchema = z.object({
 export const SisyphusConfigSchema = z.object({
   tasks: SisyphusTasksConfigSchema.optional(),
 })
-export const OhMyOpenCodeConfigSchema = z.object({
+// --- Claude-Flow Integration Config ---
+
+export const ClaudeFlowRoutingPolicySchema = z.object({
+  /** Enable swarm routing (default: false — all goes to LocalBackend) */
+  enabled: z.boolean().default(false),
+  /** Categories that route to SwarmBackend */
+  swarmCategories: z.array(z.string()).default(["ultrabrain"]),
+  /** Categories that always stay local */
+  localCategories: z.array(z.string()).default(["quick"]),
+  /** Default executor when category not explicitly mapped */
+  defaultExecutor: z.enum(["local", "swarm"]).default("local"),
+  /** Auto-invoke swarm threshold: min files changed to trigger swarm */
+  autoSwarmFileThreshold: z.number().min(1).default(3),
+})
+
+export const ClaudeFlowMemoryConfigSchema = z.object({
+  /** Enable memory integration (default: false) */
+  enabled: z.boolean().default(false),
+  /** Memory backend */
+  backend: z.enum(["hybrid", "agentdb", "sqlite", "memory"]).default("hybrid"),
+  /** Default namespace for memory operations */
+  defaultNamespace: z.string().default("shared"),
+  /** Max results per search */
+  maxSearchResults: z.number().min(1).default(10),
+  /** Auto-store learnings after task completion */
+  autoStoreLearnings: z.boolean().default(false),
+})
+
+export const ClaudeFlowConsensusConfigSchema = z.object({
+  /** Enable consensus integration (default: false) */
+  enabled: z.boolean().default(false),
+  /** Default consensus algorithm */
+  defaultAlgorithm: z.enum(["raft", "byzantine", "gossip", "crdt", "quorum"]).default("raft"),
+  /** Categories that require consensus before execution */
+  requiredCategories: z.array(z.string()).default([]),
+})
+
+export const ClaudeFlowConfigSchema = z.object({
+  /** Enable claude-flow integration (default: false) */
+  enabled: z.boolean().default(false),
+  /** Runtime mode: 'managed' auto-starts daemon, 'external' expects running instance */
+  runtime: z.enum(["managed", "external"]).default("managed"),
+  /** MCP server port (default: 3000) */
+  mcpPort: z.number().default(3000),
+  /** Version pin (default: "v3alpha") */
+  versionPin: z.string().default("v3alpha"),
+  /** Transport preference */
+  transport: z.enum(["mcp", "cli"]).default("mcp"),
+  /** Auto-start daemon on plugin load (default: true when runtime=managed) */
+  autoStart: z.boolean().default(true),
+  /** Health check interval in ms (default: 30000) */
+  healthCheckIntervalMs: z.number().min(5000).default(30000),
+  /** Command to invoke claude-flow (default: ["npx", "claude-flow@{versionPin}"]).
+   *  Supports bunx, pnpm dlx, or absolute path. */
+  command: z.array(z.string()).optional(),
+  /** Routing policy: maps categories to executor backends */
+  routingPolicy: ClaudeFlowRoutingPolicySchema.optional(),
+  /** Memory configuration */
+  memory: ClaudeFlowMemoryConfigSchema.optional(),
+  /** Consensus configuration */
+  consensus: ClaudeFlowConsensusConfigSchema.optional(),
+})
+
+// --- Main Config Schema ---
+
+export const SisyphusFlowConfigSchema = z.object({
   $schema: z.string().optional(),
   /** Enable new task system (default: false) */
   new_task_system_enabled: z.boolean().optional(),
-  /** Default agent name for `oh-my-opencode run` (env: OPENCODE_DEFAULT_AGENT) */
+  /** Default agent name for `sisyphus-flow run` (env: OPENCODE_DEFAULT_AGENT) */
   default_run_agent: z.string().optional(),
   disabled_mcps: z.array(AnyMcpNameSchema).optional(),
   disabled_agents: z.array(BuiltinAgentNameSchema).optional(),
@@ -395,9 +460,16 @@ export const OhMyOpenCodeConfigSchema = z.object({
   browser_automation_engine: BrowserAutomationConfigSchema.optional(),
   tmux: TmuxConfigSchema.optional(),
   sisyphus: SisyphusConfigSchema.optional(),
+  /** Claude-flow multi-agent orchestration integration */
+  claude_flow: ClaudeFlowConfigSchema.optional(),
 })
 
-export type OhMyOpenCodeConfig = z.infer<typeof OhMyOpenCodeConfigSchema>
+/** @deprecated Use SisyphusFlowConfigSchema — backward-compat alias */
+export const OhMyOpenCodeConfigSchema = SisyphusFlowConfigSchema
+
+export type SisyphusFlowConfig = z.infer<typeof SisyphusFlowConfigSchema>
+/** @deprecated Use SisyphusFlowConfig — backward-compat alias */
+export type OhMyOpenCodeConfig = SisyphusFlowConfig
 export type AgentOverrideConfig = z.infer<typeof AgentOverrideConfigSchema>
 export type AgentOverrides = z.infer<typeof AgentOverridesSchema>
 export type BackgroundTaskConfig = z.infer<typeof BackgroundTaskConfigSchema>
@@ -424,5 +496,10 @@ export type TmuxConfig = z.infer<typeof TmuxConfigSchema>
 export type TmuxLayout = z.infer<typeof TmuxLayoutSchema>
 export type SisyphusTasksConfig = z.infer<typeof SisyphusTasksConfigSchema>
 export type SisyphusConfig = z.infer<typeof SisyphusConfigSchema>
+
+export type ClaudeFlowConfig = z.infer<typeof ClaudeFlowConfigSchema>
+export type ClaudeFlowRoutingPolicy = z.infer<typeof ClaudeFlowRoutingPolicySchema>
+export type ClaudeFlowMemoryConfig = z.infer<typeof ClaudeFlowMemoryConfigSchema>
+export type ClaudeFlowConsensusConfig = z.infer<typeof ClaudeFlowConsensusConfigSchema>
 
 export { AnyMcpNameSchema, type AnyMcpName, McpNameSchema, type McpName } from "../mcp/types"

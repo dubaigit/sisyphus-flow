@@ -66,6 +66,7 @@ import {
 } from "./features/claude-code-session-state";
 import {
   builtinTools,
+  claudeFlowTools,
   createCallOmoAgent,
   createBackgroundTools,
   createLookAt,
@@ -83,6 +84,10 @@ import {
   createTaskList,
   createTaskUpdateTool,
 } from "./tools";
+import {
+  createClaudeFlowRuntime,
+  destroyClaudeFlowRuntime,
+} from "./claude-flow";
 import { BackgroundManager } from "./features/background-agent";
 import { SkillMcpManager } from "./features/skill-mcp-manager";
 import { initTaskToastManager } from "./features/task-toast-manager";
@@ -310,6 +315,9 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
         tmuxSessionManager.cleanup().catch((error) => {
           log("[index] tmux cleanup error during shutdown:", error);
         });
+        if (claudeFlowEnabled) {
+          destroyClaudeFlowRuntime();
+        }
       },
     },
   );
@@ -319,6 +327,54 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     : null;
 
   initTaskToastManager(ctx.client);
+
+  // --- Claude-Flow Runtime (conditional) ---
+  const claudeFlowEnabled = pluginConfig.claude_flow?.enabled ?? false;
+  if (claudeFlowEnabled) {
+    log("[ClaudeFlow] Initializing runtime", {
+      runtime: pluginConfig.claude_flow?.runtime ?? "managed",
+      transport: pluginConfig.claude_flow?.transport ?? "mcp",
+    });
+    try {
+      const cfConfig = pluginConfig.claude_flow!;
+      const runtime = createClaudeFlowRuntime({
+        enabled: true,
+        runtime: cfConfig.runtime ?? "managed",
+        mcpPort: cfConfig.mcpPort ?? 3000,
+        versionPin: cfConfig.versionPin ?? "v3alpha",
+        transport: cfConfig.transport ?? "mcp",
+        autoStart: cfConfig.autoStart ?? true,
+        healthCheckIntervalMs: cfConfig.healthCheckIntervalMs ?? 30000,
+        command: cfConfig.command,
+        routingPolicy: {
+          enabled: cfConfig.routingPolicy?.enabled ?? false,
+          swarmCategories: cfConfig.routingPolicy?.swarmCategories ?? ["ultrabrain"],
+          localCategories: cfConfig.routingPolicy?.localCategories ?? ["quick"],
+          defaultExecutor: cfConfig.routingPolicy?.defaultExecutor ?? "local",
+          autoSwarmFileThreshold: cfConfig.routingPolicy?.autoSwarmFileThreshold ?? 3,
+        },
+        memory: {
+          enabled: cfConfig.memory?.enabled ?? false,
+          backend: cfConfig.memory?.backend ?? "hybrid",
+          defaultNamespace: cfConfig.memory?.defaultNamespace ?? "shared",
+          maxSearchResults: cfConfig.memory?.maxSearchResults ?? 10,
+          autoStoreLearnings: cfConfig.memory?.autoStoreLearnings ?? false,
+        },
+        consensus: {
+          enabled: cfConfig.consensus?.enabled ?? false,
+          defaultAlgorithm: cfConfig.consensus?.defaultAlgorithm ?? "raft",
+          requiredCategories: cfConfig.consensus?.requiredCategories ?? [],
+        },
+      });
+      if (runtime && pluginConfig.claude_flow?.autoStart !== false) {
+        runtime.start().catch((err) => {
+          log("[ClaudeFlow] Failed to start runtime:", err);
+        });
+      }
+    } catch (err) {
+      log("[ClaudeFlow] Failed to create runtime:", err);
+    }
+  }
 
   const stopContinuationGuard = isHookEnabled("stop-continuation-guard")
     ? createStopContinuationGuardHook(ctx)
@@ -386,6 +442,17 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
   const lookAt = isMultimodalLookerEnabled ? createLookAt(ctx) : null;
   const browserProvider =
     pluginConfig.browser_automation_engine?.provider ?? "playwright";
+  // Resolve routing policy from claude-flow config (only when CF is enabled)
+  const routingPolicy = claudeFlowEnabled && pluginConfig.claude_flow?.routingPolicy?.enabled
+    ? {
+        enabled: true,
+        swarmCategories: pluginConfig.claude_flow.routingPolicy.swarmCategories ?? ["ultrabrain"],
+        localCategories: pluginConfig.claude_flow.routingPolicy.localCategories ?? ["quick"],
+        defaultExecutor: (pluginConfig.claude_flow.routingPolicy.defaultExecutor ?? "local") as "local" | "swarm",
+        autoSwarmFileThreshold: pluginConfig.claude_flow.routingPolicy.autoSwarmFileThreshold ?? 3,
+      }
+    : undefined;
+
   const delegateTask = createDelegateTask({
     manager: backgroundManager,
     client: ctx.client,
@@ -394,6 +461,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     gitMasterConfig: pluginConfig.git_master,
     sisyphusJuniorModel: pluginConfig.agents?.["sisyphus-junior"]?.model,
     browserProvider,
+    routingPolicy,
     onSyncSessionCreated: async (event) => {
       log("[index] onSyncSessionCreated callback", {
         sessionID: event.sessionID,
@@ -485,6 +553,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     tool: {
       ...builtinTools,
       ...backgroundTools,
+      ...(claudeFlowEnabled ? claudeFlowTools : {}),
       call_omo_agent: callOmoAgent,
       ...(lookAt ? { look_at: lookAt } : {}),
       delegate_task: delegateTask,
