@@ -21,7 +21,7 @@ import type { BrowserAutomationProvider } from "../config/schema"
 type AgentSource = AgentFactory | AgentConfig
 
 const agentSources: Record<BuiltinAgentName, AgentSource> = {
-  sisyphus: createSisyphusAgent,
+  "sisyphus-flow": createSisyphusAgent,
   hephaestus: createHephaestusAgent,
   oracle: createOracleAgent,
   librarian: createLibrarianAgent,
@@ -282,7 +282,7 @@ export async function createBuiltinAgents(
    for (const [name, source] of Object.entries(agentSources)) {
      const agentName = name as BuiltinAgentName
 
-     if (agentName === "sisyphus") continue
+     if (agentName === "sisyphus-flow") continue
      if (agentName === "hephaestus") continue
      if (agentName === "atlas") continue
      if (disabledAgents.some((name) => name.toLowerCase() === agentName.toLowerCase())) continue
@@ -342,8 +342,8 @@ export async function createBuiltinAgents(
     }
   }
 
-   const sisyphusOverride = agentOverrides["sisyphus"]
-   const sisyphusRequirement = AGENT_MODEL_REQUIREMENTS["sisyphus"]
+   const sisyphusOverride = agentOverrides["sisyphus-flow"]
+   const sisyphusRequirement = AGENT_MODEL_REQUIREMENTS["sisyphus-flow"]
    const hasSisyphusExplicitConfig = sisyphusOverride !== undefined
    const meetsSisyphusAnyModelRequirement =
      !sisyphusRequirement?.requiresAnyModel ||
@@ -351,7 +351,7 @@ export async function createBuiltinAgents(
      isFirstRunNoCache ||
      isAnyFallbackModelAvailable(sisyphusRequirement.fallbackChain, availableModels)
 
-   if (!disabledAgents.includes("sisyphus") && meetsSisyphusAnyModelRequirement) {
+   if (!disabledAgents.includes("sisyphus-flow") && meetsSisyphusAnyModelRequirement) {
     let sisyphusResolution = applyModelResolution({
       uiSelectedModel,
       userModel: sisyphusOverride?.model,
@@ -382,7 +382,7 @@ export async function createBuiltinAgents(
       sisyphusConfig = applyOverrides(sisyphusConfig, sisyphusOverride, mergedCategories)
       sisyphusConfig = applyEnvironmentContext(sisyphusConfig, directory)
 
-      result["sisyphus"] = sisyphusConfig
+      result["sisyphus-flow"] = sisyphusConfig
     }
    }
 

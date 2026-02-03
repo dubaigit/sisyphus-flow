@@ -93,7 +93,7 @@ exports[`generateModelConfig single native provider uses Claude models when only
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
@@ -155,7 +155,7 @@ exports[`generateModelConfig single native provider uses Claude models with isMa
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
@@ -476,7 +476,7 @@ exports[`generateModelConfig all native providers uses preferred models from fal
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
@@ -549,7 +549,7 @@ exports[`generateModelConfig all native providers uses preferred models with isM
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
@@ -623,7 +623,7 @@ exports[`generateModelConfig fallback providers uses OpenCode Zen models when on
       "model": "opencode/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "opencode/claude-opus-4-5",
       "variant": "max",
     },
@@ -696,7 +696,7 @@ exports[`generateModelConfig fallback providers uses OpenCode Zen models with is
       "model": "opencode/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "opencode/claude-opus-4-5",
       "variant": "max",
     },
@@ -770,7 +770,7 @@ exports[`generateModelConfig fallback providers uses GitHub Copilot models when 
       "model": "github-copilot/claude-opus-4.5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "github-copilot/claude-opus-4.5",
       "variant": "max",
     },
@@ -843,7 +843,7 @@ exports[`generateModelConfig fallback providers uses GitHub Copilot models with 
       "model": "github-copilot/claude-opus-4.5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "github-copilot/claude-opus-4.5",
       "variant": "max",
     },
@@ -909,7 +909,7 @@ exports[`generateModelConfig fallback providers uses ZAI model for librarian whe
     "prometheus": {
       "model": "opencode/glm-4.7-free",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "zai-coding-plan/glm-4.7",
     },
   },
@@ -964,7 +964,7 @@ exports[`generateModelConfig fallback providers uses ZAI model for librarian wit
     "prometheus": {
       "model": "opencode/glm-4.7-free",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "zai-coding-plan/glm-4.7",
     },
   },
@@ -1027,7 +1027,7 @@ exports[`generateModelConfig mixed provider scenarios uses Claude + OpenCode Zen
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
@@ -1100,7 +1100,7 @@ exports[`generateModelConfig mixed provider scenarios uses OpenAI + Copilot comb
       "model": "github-copilot/claude-opus-4.5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "github-copilot/claude-opus-4.5",
       "variant": "max",
     },
@@ -1169,7 +1169,7 @@ exports[`generateModelConfig mixed provider scenarios uses Claude + ZAI combinat
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
@@ -1231,7 +1231,7 @@ exports[`generateModelConfig mixed provider scenarios uses Gemini + Claude combi
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
@@ -1300,7 +1300,7 @@ exports[`generateModelConfig mixed provider scenarios uses all fallback provider
       "model": "github-copilot/claude-opus-4.5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "github-copilot/claude-opus-4.5",
       "variant": "max",
     },
@@ -1373,7 +1373,7 @@ exports[`generateModelConfig mixed provider scenarios uses all providers togethe
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
@@ -1446,7 +1446,7 @@ exports[`generateModelConfig mixed provider scenarios uses all providers with is
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },
-    "sisyphus": {
+    "sisyphus-flow": {
       "model": "anthropic/claude-opus-4-5",
       "variant": "max",
     },

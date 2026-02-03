@@ -291,7 +291,7 @@ describe("prometheus-md-only", () => {
 
   describe("with non-Prometheus agent in message storage", () => {
     beforeEach(() => {
-      setupMessageStorage(TEST_SESSION_ID, "sisyphus")
+      setupMessageStorage(TEST_SESSION_ID, "sisyphus-flow")
     })
 
     test("should not affect non-Prometheus agents", async () => {

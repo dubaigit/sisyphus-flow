@@ -3,14 +3,14 @@ import { AGENT_DISPLAY_NAMES, getAgentDisplayName } from "./agent-display-names"
 
 describe("getAgentDisplayName", () => {
   it("returns display name for lowercase config key (new format)", () => {
-    // given config key "sisyphus"
-    const configKey = "sisyphus"
+    // given config key "sisyphus-flow"
+    const configKey = "sisyphus-flow"
 
     // when getAgentDisplayName called
     const result = getAgentDisplayName(configKey)
 
-    // then returns "Sisyphus (Ultraworker)"
-    expect(result).toBe("Sisyphus (Ultraworker)")
+    // then returns "Sisyphus-Flow (Ultraworker)"
+    expect(result).toBe("Sisyphus-Flow (Ultraworker)")
   })
 
   it("returns display name for uppercase config key (old format - case-insensitive)", () => {
@@ -20,8 +20,8 @@ describe("getAgentDisplayName", () => {
     // when getAgentDisplayName called
     const result = getAgentDisplayName(configKey)
 
-    // then returns "Sisyphus (Ultraworker)" (case-insensitive lookup)
-    expect(result).toBe("Sisyphus (Ultraworker)")
+    // then returns "Sisyphus-Flow (Ultraworker)" (backward-compat via case-insensitive lookup)
+    expect(result).toBe("Sisyphus-Flow (Ultraworker)")
   })
 
   it("returns original key for unknown agents (fallback)", () => {
@@ -139,7 +139,8 @@ describe("AGENT_DISPLAY_NAMES", () => {
   it("contains all expected agent mappings", () => {
     // given expected mappings
     const expectedMappings = {
-      sisyphus: "Sisyphus (Ultraworker)",
+      "sisyphus-flow": "Sisyphus-Flow (Ultraworker)",
+      sisyphus: "Sisyphus-Flow (Ultraworker)",
       atlas: "Atlas (Plan Execution Orchestrator)",
       prometheus: "Prometheus (Plan Builder)",
       "sisyphus-junior": "Sisyphus-Junior",

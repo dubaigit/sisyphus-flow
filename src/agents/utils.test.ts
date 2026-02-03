@@ -26,9 +26,9 @@ describe("createBuiltinAgents with model overrides", () => {
       const agents = await createBuiltinAgents([], {}, undefined, TEST_DEFAULT_MODEL, undefined, undefined, [], {})
 
       // #then
-      expect(agents.sisyphus.model).toBe("anthropic/claude-opus-4-5")
-      expect(agents.sisyphus.thinking).toEqual({ type: "enabled", budgetTokens: 32000 })
-      expect(agents.sisyphus.reasoningEffort).toBeUndefined()
+      expect(agents["sisyphus-flow"].model).toBe("anthropic/claude-opus-4-5")
+      expect(agents["sisyphus-flow"].thinking).toEqual({ type: "enabled", budgetTokens: 32000 })
+      expect(agents["sisyphus-flow"].reasoningEffort).toBeUndefined()
     } finally {
       fetchSpy.mockRestore()
     }
@@ -37,16 +37,16 @@ describe("createBuiltinAgents with model overrides", () => {
   test("Sisyphus with GPT model override has reasoningEffort, no thinking", async () => {
     // #given
     const overrides = {
-      sisyphus: { model: "github-copilot/gpt-5.2" },
+      "sisyphus-flow": { model: "github-copilot/gpt-5.2" },
     }
 
     // #when
     const agents = await createBuiltinAgents([], overrides, undefined, TEST_DEFAULT_MODEL)
 
     // #then
-    expect(agents.sisyphus.model).toBe("github-copilot/gpt-5.2")
-    expect(agents.sisyphus.reasoningEffort).toBe("medium")
-    expect(agents.sisyphus.thinking).toBeUndefined()
+    expect(agents["sisyphus-flow"].model).toBe("github-copilot/gpt-5.2")
+    expect(agents["sisyphus-flow"].reasoningEffort).toBe("medium")
+    expect(agents["sisyphus-flow"].thinking).toBeUndefined()
   })
 
   test("Atlas uses uiSelectedModel when provided", async () => {
@@ -90,8 +90,8 @@ describe("createBuiltinAgents with model overrides", () => {
       const agents = await createBuiltinAgents([], {}, undefined, systemDefaultModel, undefined, undefined, [], {})
 
       // #then
-      expect(agents.sisyphus).toBeDefined()
-      expect(agents.sisyphus.model).toBe("anthropic/claude-opus-4-5")
+      expect(agents["sisyphus-flow"]).toBeDefined()
+      expect(agents["sisyphus-flow"].model).toBe("anthropic/claude-opus-4-5")
     } finally {
       cacheSpy.mockRestore()
       fetchSpy.mockRestore()
@@ -160,15 +160,15 @@ describe("createBuiltinAgents with model overrides", () => {
    test("non-model overrides are still applied after factory rebuild", async () => {
      // #given
      const overrides = {
-       sisyphus: { model: "github-copilot/gpt-5.2", temperature: 0.5 },
+       "sisyphus-flow": { model: "github-copilot/gpt-5.2", temperature: 0.5 },
      }
 
      // #when
      const agents = await createBuiltinAgents([], overrides, undefined, TEST_DEFAULT_MODEL)
 
      // #then
-     expect(agents.sisyphus.model).toBe("github-copilot/gpt-5.2")
-     expect(agents.sisyphus.temperature).toBe(0.5)
+     expect(agents["sisyphus-flow"].model).toBe("github-copilot/gpt-5.2")
+     expect(agents["sisyphus-flow"].temperature).toBe(0.5)
    })
 })
 
@@ -218,8 +218,8 @@ describe("createBuiltinAgents without systemDefaultModel", () => {
       const agents = await createBuiltinAgents([], {}, undefined, undefined, undefined, undefined, [], {})
 
       // #then
-      expect(agents.sisyphus).toBeDefined()
-      expect(agents.sisyphus.model).toBe("anthropic/claude-opus-4-5")
+      expect(agents["sisyphus-flow"]).toBeDefined()
+      expect(agents["sisyphus-flow"].model).toBe("anthropic/claude-opus-4-5")
     } finally {
       cacheSpy.mockRestore()
       fetchSpy.mockRestore()
@@ -313,7 +313,7 @@ describe("createBuiltinAgents with requiresAnyModel gating (sisyphus)", () => {
       const agents = await createBuiltinAgents([], {}, undefined, TEST_DEFAULT_MODEL, undefined, undefined, [], {})
 
       // #then
-      expect(agents.sisyphus).toBeDefined()
+      expect(agents["sisyphus-flow"]).toBeDefined()
     } finally {
       fetchSpy.mockRestore()
     }
@@ -329,8 +329,8 @@ describe("createBuiltinAgents with requiresAnyModel gating (sisyphus)", () => {
       const agents = await createBuiltinAgents([], {}, undefined, TEST_DEFAULT_MODEL, undefined, undefined, [], {})
 
       // #then
-      expect(agents.sisyphus).toBeDefined()
-      expect(agents.sisyphus.model).toBe("anthropic/claude-opus-4-5")
+      expect(agents["sisyphus-flow"]).toBeDefined()
+      expect(agents["sisyphus-flow"].model).toBe("anthropic/claude-opus-4-5")
     } finally {
       cacheSpy.mockRestore()
       fetchSpy.mockRestore()
@@ -341,7 +341,7 @@ describe("createBuiltinAgents with requiresAnyModel gating (sisyphus)", () => {
     // #given
     const fetchSpy = spyOn(shared, "fetchAvailableModels").mockResolvedValue(new Set())
     const overrides = {
-      sisyphus: { model: "anthropic/claude-opus-4-5" },
+      "sisyphus-flow": { model: "anthropic/claude-opus-4-5" },
     }
 
     try {
@@ -349,7 +349,7 @@ describe("createBuiltinAgents with requiresAnyModel gating (sisyphus)", () => {
       const agents = await createBuiltinAgents([], overrides, undefined, TEST_DEFAULT_MODEL, undefined, undefined, [], {})
 
       // #then
-      expect(agents.sisyphus).toBeDefined()
+      expect(agents["sisyphus-flow"]).toBeDefined()
     } finally {
       fetchSpy.mockRestore()
     }
@@ -366,7 +366,7 @@ describe("createBuiltinAgents with requiresAnyModel gating (sisyphus)", () => {
       const agents = await createBuiltinAgents([], {}, undefined, TEST_DEFAULT_MODEL, undefined, undefined, [], {})
 
       // #then
-      expect(agents.sisyphus).toBeUndefined()
+      expect(agents["sisyphus-flow"]).toBeUndefined()
     } finally {
       fetchSpy.mockRestore()
     }
@@ -697,16 +697,16 @@ describe("override.category expansion in createBuiltinAgents", () => {
   test("sisyphus override with category expands category properties", async () => {
     // #given
     const overrides = {
-      sisyphus: { category: "ultrabrain" } as any,
+      "sisyphus-flow": { category: "ultrabrain" } as any,
     }
 
     // #when
     const agents = await createBuiltinAgents([], overrides, undefined, TEST_DEFAULT_MODEL)
 
     // #then - ultrabrain category: model=openai/gpt-5.2-codex, variant=xhigh
-    expect(agents.sisyphus).toBeDefined()
-    expect(agents.sisyphus.model).toBe("openai/gpt-5.2-codex")
-    expect(agents.sisyphus.variant).toBe("xhigh")
+    expect(agents["sisyphus-flow"]).toBeDefined()
+    expect(agents["sisyphus-flow"].model).toBe("openai/gpt-5.2-codex")
+    expect(agents["sisyphus-flow"].variant).toBe("xhigh")
   })
 
   test("atlas override with category expands category properties", async () => {

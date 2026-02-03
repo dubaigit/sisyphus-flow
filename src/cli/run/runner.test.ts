@@ -54,12 +54,12 @@ describe("resolveRunAgent", () => {
     const agent = resolveRunAgent({ message: "test" }, config, {})
 
     // then
-    expect(agent).toBe("sisyphus")
+    expect(agent).toBe("sisyphus-flow")
   })
 
   it("skips disabled sisyphus for next available core agent", () => {
     // given
-    const config = createConfig({ disabled_agents: ["sisyphus"] })
+    const config = createConfig({ disabled_agents: ["sisyphus-flow"] })
 
     // when
     const agent = resolveRunAgent({ message: "test" }, config, {})

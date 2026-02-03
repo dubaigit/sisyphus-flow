@@ -34,7 +34,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent session with multiple tool calls
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "sisyphus-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output = { title: "", output: "file content", metadata: {} }
 
@@ -115,9 +115,9 @@ describe("category-skill-reminder hook", () => {
       const output = { title: "", output: "result", metadata: {} }
 
       // when - 3 tool calls with agent in input
-      await hook["tool.execute.after"]({ tool: "edit", sessionID, callID: "1", agent: "Sisyphus" }, output)
-      await hook["tool.execute.after"]({ tool: "edit", sessionID, callID: "2", agent: "Sisyphus" }, output)
-      await hook["tool.execute.after"]({ tool: "edit", sessionID, callID: "3", agent: "Sisyphus" }, output)
+      await hook["tool.execute.after"]({ tool: "edit", sessionID, callID: "1", agent: "sisyphus-flow" }, output)
+      await hook["tool.execute.after"]({ tool: "edit", sessionID, callID: "2", agent: "sisyphus-flow" }, output)
+      await hook["tool.execute.after"]({ tool: "edit", sessionID, callID: "3", agent: "sisyphus-flow" }, output)
 
       // then - reminder should be injected
       expect(output.output).toContain("[Category+Skill Reminder]")
@@ -129,7 +129,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent that uses delegate_task
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "delegation-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output = { title: "", output: "result", metadata: {} }
 
@@ -149,7 +149,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent that uses call_omo_agent
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "omo-agent-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output = { title: "", output: "result", metadata: {} }
 
@@ -169,7 +169,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent that uses task tool
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "task-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output = { title: "", output: "result", metadata: {} }
 
@@ -191,7 +191,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent with only 2 tool calls
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "few-calls-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output = { title: "", output: "result", metadata: {} }
 
@@ -209,7 +209,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent session
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "once-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output1 = { title: "", output: "result1", metadata: {} }
       const output2 = { title: "", output: "result2", metadata: {} }
@@ -233,7 +233,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent with mixed tool calls
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "mixed-tools-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output = { title: "", output: "result", metadata: {} }
 
@@ -254,7 +254,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent with reminder already shown
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "delete-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output1 = { title: "", output: "result1", metadata: {} }
       await hook["tool.execute.after"]({ tool: "edit", sessionID, callID: "1" }, output1)
@@ -280,7 +280,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent with reminder already shown
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "compact-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output1 = { title: "", output: "result1", metadata: {} }
       await hook["tool.execute.after"]({ tool: "edit", sessionID, callID: "1" }, output1)
@@ -308,7 +308,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent with mixed case tool names
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "case-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output = { title: "", output: "result", metadata: {} }
 
@@ -327,7 +327,7 @@ describe("category-skill-reminder hook", () => {
       // given - sisyphus agent using DELEGATE_TASK in uppercase
       const hook = createCategorySkillReminderHook(createMockPluginInput())
       const sessionID = "case-delegate-session"
-      updateSessionAgent(sessionID, "Sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       const output = { title: "", output: "result", metadata: {} }
 

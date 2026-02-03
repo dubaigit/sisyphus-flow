@@ -3,11 +3,12 @@ import { log } from "./logger"
 
 // Migration map: old keys → new keys (for backward compatibility)
 export const AGENT_NAME_MAP: Record<string, string> = {
-  // Sisyphus variants → "sisyphus"
-  omo: "sisyphus",
-  OmO: "sisyphus",
-  Sisyphus: "sisyphus",
-  sisyphus: "sisyphus",
+  // Sisyphus variants → "sisyphus-flow"
+  omo: "sisyphus-flow",
+  OmO: "sisyphus-flow",
+  Sisyphus: "sisyphus-flow",
+  sisyphus: "sisyphus-flow",
+  "sisyphus-flow": "sisyphus-flow",
 
   // Prometheus variants → "prometheus"
   "OmO-Plan": "prometheus",
@@ -44,7 +45,7 @@ export const AGENT_NAME_MAP: Record<string, string> = {
 }
 
 export const BUILTIN_AGENT_NAMES = new Set([
-  "sisyphus",           // was "Sisyphus"
+  "sisyphus-flow",      // was "Sisyphus" / "sisyphus"
   "oracle",
   "librarian",
   "explore",

@@ -71,7 +71,7 @@ export function isGptModel(model: string): boolean {
 }
 
 export type BuiltinAgentName =
-  | "sisyphus"
+  | "sisyphus-flow"
   | "hephaestus"
   | "oracle"
   | "librarian"

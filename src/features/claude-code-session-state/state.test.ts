@@ -39,7 +39,7 @@ describe("claude-code-session-state", () => {
       setSessionAgent(sessionID, "Prometheus (Planner)")
 
       // when - try to overwrite
-      setSessionAgent(sessionID, "sisyphus")
+      setSessionAgent(sessionID, "sisyphus-flow")
 
       // then - first agent preserved
       expect(getSessionAgent(sessionID)).toBe("Prometheus (Planner)")
@@ -60,10 +60,10 @@ describe("claude-code-session-state", () => {
       setSessionAgent(sessionID, "Prometheus (Planner)")
 
       // when - force update
-      updateSessionAgent(sessionID, "sisyphus")
+      updateSessionAgent(sessionID, "sisyphus-flow")
 
       // then
-      expect(getSessionAgent(sessionID)).toBe("sisyphus")
+      expect(getSessionAgent(sessionID)).toBe("sisyphus-flow")
     })
   })
 
@@ -131,7 +131,7 @@ describe("claude-code-session-state", () => {
       // given - user switches to custom agent "MyCustomAgent"
       const sessionID = "test-session-custom"
       const customAgent = "MyCustomAgent"
-      const defaultAgent = "sisyphus"
+      const defaultAgent = "sisyphus-flow"
 
       // User switches to custom agent (via UI)
       setSessionAgent(sessionID, customAgent)

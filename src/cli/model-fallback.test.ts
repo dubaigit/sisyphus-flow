@@ -376,7 +376,7 @@ describe("generateModelConfig", () => {
       const result = generateModelConfig(config)
 
       // #then
-      expect(result.agents?.sisyphus?.model).toBe("anthropic/claude-opus-4-5")
+      expect(result.agents?.["sisyphus-flow"]?.model).toBe("anthropic/claude-opus-4-5")
     })
 
     test("Sisyphus is created when multiple fallback providers are available", () => {
@@ -393,7 +393,7 @@ describe("generateModelConfig", () => {
       const result = generateModelConfig(config)
 
       // #then
-      expect(result.agents?.sisyphus?.model).toBe("anthropic/claude-opus-4-5")
+      expect(result.agents?.["sisyphus-flow"]?.model).toBe("anthropic/claude-opus-4-5")
     })
 
     test("Sisyphus is omitted when no fallback provider is available (OpenAI not in chain)", () => {
@@ -404,7 +404,7 @@ describe("generateModelConfig", () => {
       const result = generateModelConfig(config)
 
       // #then
-      expect(result.agents?.sisyphus).toBeUndefined()
+      expect(result.agents?.["sisyphus-flow"]).toBeUndefined()
     })
   })
 

@@ -966,8 +966,8 @@ describe("todo-continuation-enforcer", () => {
 
     // OpenCode returns assistant messages with flat modelID/providerID, not nested model object
     const mockMessagesWithAssistant = [
-      { info: { id: "msg-1", role: "user", agent: "sisyphus", model: { providerID: "openai", modelID: "gpt-5.2" } } },
-      { info: { id: "msg-2", role: "assistant", agent: "sisyphus", modelID: "gpt-5.2", providerID: "openai" } },
+      { info: { id: "msg-1", role: "user", agent: "sisyphus-flow", model: { providerID: "openai", modelID: "gpt-5.2" } } },
+      { info: { id: "msg-2", role: "assistant", agent: "sisyphus-flow", modelID: "gpt-5.2", providerID: "openai" } },
     ]
 
     const mockInput = {
@@ -1017,8 +1017,8 @@ describe("todo-continuation-enforcer", () => {
     setMainSession(sessionID)
 
     const mockMessagesWithCompaction = [
-      { info: { id: "msg-1", role: "user", agent: "sisyphus", model: { providerID: "anthropic", modelID: "claude-sonnet-4-5" } } },
-      { info: { id: "msg-2", role: "assistant", agent: "sisyphus", modelID: "claude-sonnet-4-5", providerID: "anthropic" } },
+      { info: { id: "msg-1", role: "user", agent: "sisyphus-flow", model: { providerID: "anthropic", modelID: "claude-sonnet-4-5" } } },
+      { info: { id: "msg-2", role: "assistant", agent: "sisyphus-flow", modelID: "claude-sonnet-4-5", providerID: "anthropic" } },
       { info: { id: "msg-3", role: "assistant", agent: "compaction", modelID: "claude-sonnet-4-5", providerID: "anthropic" } },
     ]
 
@@ -1054,7 +1054,7 @@ describe("todo-continuation-enforcer", () => {
 
     // then - continuation uses Sisyphus (skipped compaction agent)
     expect(promptCalls.length).toBe(1)
-    expect(promptCalls[0].agent).toBe("sisyphus")
+    expect(promptCalls[0].agent).toBe("sisyphus-flow")
   })
 
   test("should skip injection when only compaction agent messages exist", async () => {

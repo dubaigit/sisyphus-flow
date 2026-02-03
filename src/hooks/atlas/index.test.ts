@@ -873,7 +873,7 @@ describe("atlas hook", () => {
 
        // given - last agent is NOT Atlas
        cleanupMessageStorage(MAIN_SESSION_ID)
-       setupMessageStorage(MAIN_SESSION_ID, "sisyphus")
+       setupMessageStorage(MAIN_SESSION_ID, "sisyphus-flow")
 
        const mockInput = createMockPluginInput()
        const hook = createAtlasHook(mockInput)

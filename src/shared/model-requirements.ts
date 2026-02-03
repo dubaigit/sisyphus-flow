@@ -12,7 +12,7 @@ export type ModelRequirement = {
 }
 
 export const AGENT_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
-  sisyphus: {
+  "sisyphus-flow": {
     fallbackChain: [
       { providers: ["anthropic", "github-copilot", "opencode"], model: "claude-opus-4-5", variant: "max" },
       { providers: ["kimi-for-coding"], model: "k2p5" },

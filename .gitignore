@@ -34,3 +34,7 @@ test-injection/
 notepad.md
 oauth-success.html
 *.bun-build
+
+# Claude-flow runtime artifacts
+.claude-flow/
+.swarm/

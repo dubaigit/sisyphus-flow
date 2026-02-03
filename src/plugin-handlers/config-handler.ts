@@ -48,7 +48,7 @@ export function resolveCategoryConfig(
   return userCategories?.[categoryName] ?? DEFAULT_CATEGORIES[categoryName];
 }
 
-const CORE_AGENT_ORDER = ["sisyphus", "hephaestus", "prometheus", "atlas"] as const;
+const CORE_AGENT_ORDER = ["sisyphus-flow", "hephaestus", "prometheus", "atlas"] as const;
 
 function reorderAgentsByPriority(agents: Record<string, unknown>): Record<string, unknown> {
   const ordered: Record<string, unknown> = {};
@@ -207,15 +207,15 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
       librarian?: { tools?: Record<string, unknown> };
       "multimodal-looker"?: { tools?: Record<string, unknown> };
       atlas?: { tools?: Record<string, unknown> };
-      sisyphus?: { tools?: Record<string, unknown> };
+      "sisyphus-flow"?: { tools?: Record<string, unknown> };
     };
     const configAgent = config.agent as AgentConfig | undefined;
 
-    if (isSisyphusEnabled && builtinAgents.sisyphus) {
-      (config as { default_agent?: string }).default_agent = "sisyphus";
+    if (isSisyphusEnabled && builtinAgents["sisyphus-flow"]) {
+      (config as { default_agent?: string }).default_agent = "sisyphus-flow";
 
       const agentConfig: Record<string, unknown> = {
-        sisyphus: builtinAgents.sisyphus,
+        "sisyphus-flow": builtinAgents["sisyphus-flow"],
       };
 
       agentConfig["sisyphus-junior"] = createSisyphusJuniorAgentWithOverrides(
@@ -364,7 +364,7 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
       config.agent = {
         ...agentConfig,
         ...Object.fromEntries(
-          Object.entries(builtinAgents).filter(([k]) => k !== "sisyphus")
+          Object.entries(builtinAgents).filter(([k]) => k !== "sisyphus-flow")
         ),
         ...userAgents,
         ...projectAgents,
@@ -418,8 +418,8 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
       const agent = agentResult["atlas"] as AgentWithPermission;
       agent.permission = { ...agent.permission, task: "deny", call_omo_agent: "deny", delegate_task: "allow", "task_*": "allow", teammate: "allow" };
     }
-    if (agentResult.sisyphus) {
-      const agent = agentResult.sisyphus as AgentWithPermission;
+    if (agentResult["sisyphus-flow"]) {
+      const agent = agentResult["sisyphus-flow"] as AgentWithPermission;
       agent.permission = { ...agent.permission, call_omo_agent: "deny", delegate_task: "allow", question: questionPermission, "task_*": "allow", teammate: "allow" };
     }
     if (agentResult.hephaestus) {

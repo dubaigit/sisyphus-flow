@@ -100,7 +100,7 @@ function resolveModelFromChain(
 }
 
 function getSisyphusFallbackChain(): FallbackEntry[] {
-  return AGENT_MODEL_REQUIREMENTS.sisyphus.fallbackChain
+  return AGENT_MODEL_REQUIREMENTS["sisyphus-flow"].fallbackChain
 }
 
 function isAnyFallbackEntryAvailable(
@@ -138,7 +138,7 @@ export function generateModelConfig(config: InstallConfig): GeneratedOmoConfig {
       $schema: SCHEMA_URL,
       agents: Object.fromEntries(
         Object.entries(AGENT_MODEL_REQUIREMENTS)
-          .filter(([role, req]) => !(role === "sisyphus" && req.requiresAnyModel))
+          .filter(([role, req]) => !(role === "sisyphus-flow" && req.requiresAnyModel))
           .map(([role]) => [role, { model: ULTIMATE_FALLBACK }])
       ),
       categories: Object.fromEntries(
@@ -169,7 +169,7 @@ export function generateModelConfig(config: InstallConfig): GeneratedOmoConfig {
       continue
     }
 
-    if (role === "sisyphus") {
+    if (role === "sisyphus-flow") {
       const fallbackChain = getSisyphusFallbackChain()
       if (req.requiresAnyModel && !isAnyFallbackEntryAvailable(fallbackChain, avail)) {
         continue

@@ -7,7 +7,7 @@ import { log } from "../../shared"
  * These are orchestrator agents that delegate work to specialized agents.
  */
 const TARGET_AGENTS = new Set([
-  "sisyphus",
+  "sisyphus-flow",
   "sisyphus-junior",
   "atlas",
 ])
@@ -100,7 +100,7 @@ export function createCategorySkillReminderHook(_ctx: PluginInput) {
     if (!agent) return false
     const agentLower = agent.toLowerCase()
     return TARGET_AGENTS.has(agentLower) || 
-           agentLower.includes("sisyphus") || 
+           agentLower.includes("sisyphus-flow") || 
            agentLower.includes("atlas")
   }
 

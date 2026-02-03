@@ -25,7 +25,7 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
 
   test("sisyphus has valid fallbackChain with claude-opus-4-5 as primary and requiresAnyModel", () => {
     // #given - sisyphus agent requirement
-    const sisyphus = AGENT_MODEL_REQUIREMENTS["sisyphus"]
+    const sisyphus = AGENT_MODEL_REQUIREMENTS["sisyphus-flow"]
 
     // #when - accessing Sisyphus requirement
     // #then - fallbackChain exists with claude-opus-4-5 as first entry, glm-4.7-free as last
@@ -174,7 +174,7 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
   test("all 10 builtin agents have valid fallbackChain arrays", () => {
     // #given - list of 10 agent names
     const expectedAgents = [
-      "sisyphus",
+      "sisyphus-flow",
       "hephaestus",
       "oracle",
       "librarian",

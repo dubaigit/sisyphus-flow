@@ -10,8 +10,8 @@ const POLL_INTERVAL_MS = 500
 const DEFAULT_TIMEOUT_MS = 0
 const SESSION_CREATE_MAX_RETRIES = 3
 const SESSION_CREATE_RETRY_DELAY_MS = 1000
-const CORE_AGENT_ORDER = ["sisyphus", "hephaestus", "prometheus", "atlas"] as const
-const DEFAULT_AGENT = "sisyphus"
+const CORE_AGENT_ORDER = ["sisyphus-flow", "hephaestus", "prometheus", "atlas"] as const
+const DEFAULT_AGENT = "sisyphus-flow"
 
 type EnvVars = Record<string, string | undefined>
 
@@ -26,7 +26,7 @@ const normalizeAgentName = (agent?: string): string | undefined => {
 
 const isAgentDisabled = (agent: string, config: OhMyOpenCodeConfig): boolean => {
   const lowered = agent.toLowerCase()
-  if (lowered === "sisyphus" && config.sisyphus_agent?.disabled === true) {
+  if (lowered === "sisyphus-flow" && config.sisyphus_agent?.disabled === true) {
     return true
   }
   return (config.disabled_agents ?? []).some(

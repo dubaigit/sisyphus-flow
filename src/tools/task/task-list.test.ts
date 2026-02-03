@@ -136,7 +136,7 @@ describe("createTaskList", () => {
       subject: "Test task",
       description: "This is a long description that should not be included",
       status: "in_progress",
-      owner: "sisyphus",
+      owner: "sisyphus-flow",
       blocks: [],
       blockedBy: ["T-2"],
       threadID: "test-session",
@@ -170,7 +170,7 @@ describe("createTaskList", () => {
     expect(summary.id).toBe("T-1")
     expect(summary.subject).toBe("Test task")
     expect(summary.status).toBe("in_progress")
-    expect(summary.owner).toBe("sisyphus")
+    expect(summary.owner).toBe("sisyphus-flow")
     expect(summary.blockedBy).toEqual(["T-2"])
   })
 
