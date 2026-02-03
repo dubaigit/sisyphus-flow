@@ -54,6 +54,20 @@ When summarizing this session, you MUST include the following sections in your s
 
 This section is CRITICAL for reviewer agents (momus, oracle) to maintain continuity.
 
+## 8. Claude-Flow Swarm State (ALWAYS include)
+- **Swarm Active**: Whether a claude-flow swarm was running (use \`cf_swarm_status\` to check)
+- **Active Agents**: List of spawned agents and their tasks
+- **Memory Entries**: Key decisions/learnings stored via \`cf_memory_store\` (keys and namespaces)
+- **Consensus Decisions**: Any \`cf_hive_mind_consensus\` results and their outcomes
+
+**REMINDER**: You have access to claude-flow multi-agent orchestration tools:
+\`cf_swarm_init\`, \`cf_agent_spawn\`, \`cf_swarm_status\`, \`cf_swarm_stop\`,
+\`cf_memory_store\`, \`cf_memory_search\`, \`cf_memory_retrieve\`,
+\`cf_hive_mind_consensus\`, \`cf_security_scan\`.
+
+Use \`cf_memory_search\` to retrieve prior learnings before resuming work.
+Use claude-flow swarms for coordinated multi-agent tasks (3+ agents).
+
 This context is critical for maintaining continuity after compaction.
 `
 

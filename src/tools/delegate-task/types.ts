@@ -42,6 +42,8 @@ export interface DelegateTaskToolOptions {
   sisyphusJuniorModel?: string
   browserProvider?: BrowserAutomationProvider
   onSyncSessionCreated?: (event: SyncSessionCreatedEvent) => Promise<void>
+  /** Claude-flow routing policy — when enabled, routes certain categories to swarm executor */
+  routingPolicy?: import("../../claude-flow/types").RoutingPolicy
 }
 
 export interface BuildSystemContentInput {

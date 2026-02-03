@@ -14,6 +14,9 @@ import {
   executeBackgroundTask,
   executeSyncTask,
 } from "./executor"
+import { resolveExecutorBackend } from "./routing"
+import { executeSwarmTask } from "./swarm-executor"
+import { getClaudeFlowRuntime } from "../../claude-flow"
 
 export { resolveCategoryConfig } from "./categories"
 export type { SyncSessionCreatedEvent, DelegateTaskToolOptions, BuildSystemContentInput } from "./types"
@@ -162,6 +165,42 @@ Prompts MUST be in English.`
       }
 
       const systemContent = buildSystemContent({ skillContent, categoryPromptAppend, agentName: agentToUse })
+
+      // --- Claude-Flow Swarm Routing ---
+      if (options.routingPolicy && args.category) {
+        const runtime = getClaudeFlowRuntime()
+        const routing = resolveExecutorBackend({
+          category: args.category,
+          policy: options.routingPolicy,
+          runtimeAvailable: runtime?.isRunning() ?? false,
+        })
+
+        log("[delegate_task] routing decision", {
+          category: args.category,
+          executor: routing.executor,
+          reason: routing.reason,
+        })
+
+        if (routing.executor === "swarm") {
+          const swarmResult = await executeSwarmTask({
+            description: args.description,
+            prompt: args.prompt,
+            category: args.category,
+            agentToUse,
+            systemContent,
+            skills: args.load_skills,
+          })
+
+          if (swarmResult.success && !swarmResult.fallbackToLocal) {
+            return swarmResult.output ?? `Swarm task dispatched: ${swarmResult.reason}`
+          }
+
+          // Swarm failed — fall through to local executor
+          log("[delegate_task] swarm executor failed, falling back to local", {
+            reason: swarmResult.reason,
+          })
+        }
+      }
 
       if (runInBackground) {
         return executeBackgroundTask(args, ctx, options, parentContext, agentToUse, categoryModel, systemContent)

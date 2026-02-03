@@ -141,6 +141,90 @@ Should I proceed with [recommendation], or would you prefer differently?
 </Task_Management>`
 }
 
+function buildClaudeFlowSection(availableTools: AvailableTool[]): string {
+  const cfToolNames = [
+    "cf_swarm_init", "cf_swarm_status", "cf_swarm_stop", "cf_agent_spawn",
+    "cf_memory_store", "cf_memory_search", "cf_memory_retrieve",
+    "cf_hive_mind_consensus", "cf_security_scan",
+  ]
+  const hasCfTools = cfToolNames.some(name => availableTools.some(t => t.name === name))
+  if (!hasCfTools) return ""
+
+  return `
+## Claude-Flow Multi-Agent Orchestration
+
+You have access to **claude-flow** — a managed multi-agent swarm runtime. These tools enable you to orchestrate agent swarms, persist knowledge across sessions, run consensus votes, and perform security scans.
+
+### When to Use Claude-Flow vs delegate_task
+
+| Scenario | Use | Why |
+|----------|-----|-----|
+| Single task, single agent | \`delegate_task\` | Lower overhead, simpler |
+| Multi-agent coordination (3+ agents working together) | **Claude-Flow swarm** | Topology, consensus, shared memory |
+| Need persistent cross-session knowledge | **cf_memory_store/search** | Vector memory survives compaction |
+| Architecture decisions needing multi-perspective consensus | **cf_hive_mind_consensus** | Raft/Byzantine consensus across agents |
+| Security audit of codebase | **cf_security_scan** | CVE, secrets, OWASP scanning |
+| Complex multi-step with agent specialization | **Claude-Flow swarm** | Hierarchical topology prevents drift |
+
+### Available Claude-Flow Tools
+
+#### Swarm Management
+| Tool | Purpose | Key Args |
+|------|---------|----------|
+| \`cf_swarm_init\` | Initialize a multi-agent swarm | topology (hierarchical default), max_agents (6-8), strategy, consensus |
+| \`cf_swarm_status\` | Check swarm health and active agents | (none) |
+| \`cf_swarm_stop\` | Tear down the swarm | (none) |
+| \`cf_agent_spawn\` | Spawn an agent in the swarm | type (coder/tester/reviewer/architect/etc), task, model |
+
+#### Vector Memory (Cross-Session)
+| Tool | Purpose | Key Args |
+|------|---------|----------|
+| \`cf_memory_store\` | Store knowledge in vector memory | key, value, namespace (shared/security/performance), tags |
+| \`cf_memory_search\` | Semantic search across stored knowledge | query (natural language), namespace, limit |
+| \`cf_memory_retrieve\` | Get a specific entry by key | key, namespace |
+
+#### Consensus & Security
+| Tool | Purpose | Key Args |
+|------|---------|----------|
+| \`cf_hive_mind_consensus\` | Multi-agent consensus vote | question, algorithm (raft default), topology |
+| \`cf_security_scan\` | Vulnerability scanning | target, depth (quick/standard/deep), type (code/deps/all), fix |
+
+### Claude-Flow Workflow Pattern
+
+\`\`\`
+// 1. Initialize swarm for complex multi-agent work
+cf_swarm_init(topology="hierarchical", max_agents=6, strategy="specialized")
+
+// 2. Check memory for prior learnings before starting
+cf_memory_search(query="auth implementation patterns", namespace="shared")
+
+// 3. Spawn specialized agents
+cf_agent_spawn(type="architect", task="Design the auth module")
+cf_agent_spawn(type="coder", task="Implement JWT middleware")
+cf_agent_spawn(type="tester", task="Write auth integration tests")
+
+// 4. For architecture decisions, use consensus
+cf_hive_mind_consensus(question="Should we use session-based or token-based auth?")
+
+// 5. Store learnings for future sessions
+cf_memory_store(key="auth/decision", value="Token-based JWT with refresh rotation", namespace="shared")
+
+// 6. Run security scan on completed work
+cf_security_scan(target="src/auth", depth="deep", type="code")
+
+// 7. Clean up when done
+cf_swarm_stop()
+\`\`\`
+
+### Anti-Drift Rules
+- **Always use hierarchical topology** unless you have a specific reason for mesh/star
+- **Keep max_agents at 6-8** — more agents = more coordination overhead
+- **Use raft consensus** by default — leader-based, prevents split-brain
+- **Store important decisions in memory** — they survive context compaction
+- **Check memory before starting** — avoid re-discovering what was already learned
+`
+}
+
 function buildDynamicSisyphusPrompt(
   availableAgents: AvailableAgent[],
   availableTools: AvailableTool[] = [],
@@ -158,6 +242,7 @@ function buildDynamicSisyphusPrompt(
   const hardBlocks = buildHardBlocksSection()
   const antiPatterns = buildAntiPatternsSection()
   const taskManagementSection = buildTaskManagementSection(useTaskSystem)
+  const claudeFlowSection = buildClaudeFlowSection(availableTools)
   const todoHookNote = useTaskSystem
     ? "YOUR TASK CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TASK CONTINUATION])"
     : "YOUR TODO CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TODO CONTINUATION])"
@@ -337,6 +422,8 @@ AFTER THE WORK YOU DELEGATED SEEMS DONE, ALWAYS VERIFY THE RESULTS AS FOLLOWING:
 - DID THE AGENT FOLLOWED "MUST DO" AND "MUST NOT DO" REQUIREMENTS?
 
 **Vague prompts = rejected. Be exhaustive.**
+
+${claudeFlowSection}
 
 ### Session Continuity (MANDATORY)
 

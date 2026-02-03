@@ -67,6 +67,24 @@ export const ULTRAWORK_GPT_MESSAGE = `<ultrawork-mode>
 - If task requires specialized expertise (frontend-ui-ux, git operations), delegate.
 - If you need information from multiple sources, fire parallel background agents.
 
+## CLAUDE-FLOW TOOLS (Multi-Agent Swarm Orchestration)
+
+You have access to claude-flow tools for coordinated multi-agent work:
+
+| Tool | Purpose | When to Use |
+|------|---------|-------------|
+| \`cf_swarm_init\` | Initialize agent swarm | 3+ agents need coordination |
+| \`cf_agent_spawn\` | Spawn specialized agent | Need coder/tester/reviewer/architect in swarm |
+| \`cf_swarm_status\` | Check swarm health | Monitor active agents |
+| \`cf_swarm_stop\` | Tear down swarm | Work complete |
+| \`cf_memory_store\` | Store in vector memory | Persist decisions/learnings across sessions |
+| \`cf_memory_search\` | Semantic search memory | Check prior learnings before starting |
+| \`cf_memory_retrieve\` | Get entry by key | Retrieve specific stored knowledge |
+| \`cf_hive_mind_consensus\` | Multi-agent consensus | Architecture decisions, tradeoffs |
+| \`cf_security_scan\` | Vulnerability scan | Security audit of code/deps |
+
+**Decision**: Use claude-flow when multi-agent coordination, persistent memory, or consensus is needed. Use \`delegate_task\` for single-agent work.
+
 ## AVAILABLE RESOURCES
 
 Use these when they provide clear value based on the decision framework above:

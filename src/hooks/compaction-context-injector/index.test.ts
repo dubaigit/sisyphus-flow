@@ -99,4 +99,72 @@ describe("createCompactionContextInjector", () => {
       expect(injectedPrompt).toContain("Files already verified")
     })
   })
+
+  describe("Claude-Flow swarm state preservation", () => {
+    it("includes Claude-Flow Swarm State section in compaction prompt", async () => {
+      //#given
+      const injector = createCompactionContextInjector()
+      const context: SummarizeContext = {
+        sessionID: "test-session",
+        providerID: "anthropic",
+        modelID: "claude-sonnet-4-5",
+        usageRatio: 0.85,
+        directory: "/test/dir",
+      }
+
+      //#when
+      await injector(context)
+
+      //#then
+      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
+      const injectedPrompt = calls[0]?.[1] ?? ""
+      expect(injectedPrompt).toContain("Claude-Flow Swarm State")
+      expect(injectedPrompt).toContain("Swarm Active")
+      expect(injectedPrompt).toContain("Memory Entries")
+    })
+
+    it("includes claude-flow tool names as reminder in compaction prompt", async () => {
+      //#given
+      const injector = createCompactionContextInjector()
+      const context: SummarizeContext = {
+        sessionID: "test-session",
+        providerID: "anthropic",
+        modelID: "claude-sonnet-4-5",
+        usageRatio: 0.9,
+        directory: "/test/dir",
+      }
+
+      //#when
+      await injector(context)
+
+      //#then
+      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
+      const injectedPrompt = calls[0]?.[1] ?? ""
+      expect(injectedPrompt).toContain("cf_swarm_init")
+      expect(injectedPrompt).toContain("cf_memory_search")
+      expect(injectedPrompt).toContain("cf_hive_mind_consensus")
+      expect(injectedPrompt).toContain("cf_security_scan")
+    })
+
+    it("reminds to use cf_memory_search before resuming work", async () => {
+      //#given
+      const injector = createCompactionContextInjector()
+      const context: SummarizeContext = {
+        sessionID: "test-session",
+        providerID: "anthropic",
+        modelID: "claude-sonnet-4-5",
+        usageRatio: 0.95,
+        directory: "/test/dir",
+      }
+
+      //#when
+      await injector(context)
+
+      //#then
+      const calls = mockInjectHookMessage.mock.calls as unknown as [string, string, unknown][]
+      const injectedPrompt = calls[0]?.[1] ?? ""
+      expect(injectedPrompt).toContain("cf_memory_search")
+      expect(injectedPrompt).toContain("prior learnings before resuming")
+    })
+  })
 })
