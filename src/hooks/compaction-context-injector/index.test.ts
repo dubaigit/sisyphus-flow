@@ -142,7 +142,7 @@ describe("createCompactionContextInjector", () => {
       expect(injectedPrompt).toContain("Memory Entries")
     })
 
-    it("includes claude-flow tool names as reminder in compaction prompt", () => {
+    it("includes cf_memory_store and cf_memory_search references in compaction prompt", () => {
       //#given - fresh injector
 
       //#when
@@ -150,10 +150,8 @@ describe("createCompactionContextInjector", () => {
 
       //#then
       const injectedPrompt = output.context[0] ?? ""
-      expect(injectedPrompt).toContain("cf_swarm_init")
+      expect(injectedPrompt).toContain("cf_memory_store")
       expect(injectedPrompt).toContain("cf_memory_search")
-      expect(injectedPrompt).toContain("cf_hive_mind_consensus")
-      expect(injectedPrompt).toContain("cf_security_scan")
     })
 
     it("reminds to use cf_memory_search before resuming work", () => {

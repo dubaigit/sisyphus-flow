@@ -92,38 +92,9 @@ delegate_task(subagent_type="oracle", load_skills=[], prompt="Review my approach
 YOU MUST LEVERAGE ALL AVAILABLE AGENTS / **CATEGORY + SKILLS** TO THEIR FULLEST POTENTIAL.
 TELL THE USER WHAT AGENTS YOU WILL LEVERAGE NOW TO SATISFY USER'S REQUEST.
 
-## CLAUDE-FLOW SWARM ORCHESTRATION (USE FOR COMPLEX MULTI-AGENT WORK)
+## CLAUDE-FLOW (Multi-Agent Swarms)
 
-**You have access to claude-flow tools for multi-agent swarm orchestration.** Use them when the task benefits from coordinated multi-agent work, persistent memory, or consensus.
-
-| Tool | Purpose |
-|------|---------|
-| \`cf_swarm_init\` | Initialize a multi-agent swarm (hierarchical topology, 6-8 agents) |
-| \`cf_agent_spawn\` | Spawn specialized agents (coder, tester, reviewer, architect, etc.) |
-| \`cf_swarm_status\` | Check swarm health and active agents |
-| \`cf_swarm_stop\` | Tear down the swarm when done |
-| \`cf_memory_store\` | Store knowledge in vector memory (survives compaction) |
-| \`cf_memory_search\` | Semantic search across stored knowledge |
-| \`cf_memory_retrieve\` | Get a specific entry by key |
-| \`cf_hive_mind_consensus\` | Multi-agent consensus vote for architecture decisions |
-| \`cf_security_scan\` | Vulnerability scanning (CVE, secrets, OWASP) |
-
-**WHEN TO USE CLAUDE-FLOW:**
-- Multi-agent coordination (3+ agents working together) → \`cf_swarm_init\` + \`cf_agent_spawn\`
-- Need persistent cross-session knowledge → \`cf_memory_store/search\`
-- Architecture decisions needing consensus → \`cf_hive_mind_consensus\`
-- Security audit → \`cf_security_scan\`
-- **ALWAYS check memory first** → \`cf_memory_search\` before starting complex tasks
-
-**WORKFLOW:**
-\`\`\`
-cf_memory_search(query="relevant prior learnings")     // Check what we already know
-cf_swarm_init(topology="hierarchical", max_agents=6)   // Set up swarm
-cf_agent_spawn(type="architect", task="Design X")      // Spawn specialists
-cf_agent_spawn(type="coder", task="Implement Y")
-cf_memory_store(key="decisions/X", value="...")         // Persist learnings
-cf_swarm_stop()                                        // Clean up
-\`\`\`
+Use \`cf_*\` tools for: 3+ agent coordination (\`cf_swarm_init\` + \`cf_agent_spawn\`), persistent memory (\`cf_memory_store/search\`), consensus (\`cf_hive_mind_consensus\`), security audits (\`cf_security_scan\`). Always \`cf_memory_search\` before starting complex tasks.
 
 ## MANDATORY: PLAN AGENT INVOCATION (NON-NEGOTIABLE)
 
